@@ -297,14 +297,9 @@ class AcmeClient {
         console.log(jwk);
 
         const keysum = crypto.createHash('sha256').update(JSON.stringify(jwk));
-
-        console.log("[keysum: ]");
-        console.log(keysum);
-
         const thumbprint = util.b64escape(keysum.digest('base64'));
 
-        console.log("[thumbprint: ]");
-        console.log(thumbprint);
+        console.log(`[thumbprint: ${thumbprint}]`);
 
         const result = `${challenge.token}.${thumbprint}`;
 
