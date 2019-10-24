@@ -292,9 +292,24 @@ class AcmeClient {
 
     async getChallengeKeyAuthorization(challenge) {
         const jwk = await this.http.getJwk();
+
+        console.log("[jwk: ]");
+        console.log(jwk);
+
         const keysum = crypto.createHash('sha256').update(JSON.stringify(jwk));
+
+        console.log("[keysum: ]");
+        console.log(keysum);
+
         const thumbprint = util.b64escape(keysum.digest('base64'));
+
+        console.log("[thumbprint: ]");
+        console.log(thumbprint);
+
         const result = `${challenge.token}.${thumbprint}`;
+
+        console.log("[result: ]");
+        console.log(result);
 
         /**
          * https://github.com/ietf-wg-acme/acme/blob/master/draft-ietf-acme-acme.md#http-challenge

@@ -161,8 +161,7 @@ class HttpClient {
         /* KID or JWK */
         if (kid) {
             header.kid = kid;
-        }
-        else {
+        } else {
             header.jwk = await this.getJwk();
         }
 
@@ -194,13 +193,24 @@ class HttpClient {
      */
 
     async signedRequest(url, payload, kid = null, nonce = null, attempts = 0) {
+        console.log(`[######][ACME接口请求][url: ${url}][---------------------------------------------------------------------------------------------][start]`);
+
         if (!nonce) {
+            console.log(`[COAM][请求临时请求凭证][nonce: ${nonce}]`);
             nonce = await this.getNonce();
         }
 
+        console.log(`[原始请求接口参数][url: ${url}][kid: ${kid}][nonce: ${nonce}]`);
+        console.log("[payload:]");
+        console.log(payload);
+
         /* Sign body and send request */
         const data = await this.createSignedBody(url, payload, nonce, kid);
-        const resp = await this.request(url, 'post', { data });
+
+        console.log(`[接口签名请求参数][url: ${url}][data: ]`);
+        console.log(data);
+
+        const resp = await this.request(url, 'post', {data});
 
         /* Retry on bad nonce - https://tools.ietf.org/html/draft-ietf-acme-acme-10#section-6.4 */
         if (resp.data && resp.data.type && (resp.status === 400) && (resp.data.type === 'urn:ietf:params:acme:error:badNonce') && (attempts < this.maxBadNonceRetries)) {
@@ -210,6 +220,14 @@ class HttpClient {
             debug(`Caught invalid nonce error, retrying (${attempts}/${this.maxBadNonceRetries}) signed request to: ${url}`);
             return this.signedRequest(url, payload, kid, newNonce, attempts);
         }
+
+        console.log(`[COAM][API-REQUEST][url: ${url}]`);
+        console.log(`[COAM][API-REQUEST][resp.headers: ]`);
+        console.log(resp.headers);
+        console.log(`[COAM][API-REQUEST][resp.data: ]`);
+        console.log(resp.data);
+
+        console.log(`[######][ACME接口请求][url: ${url}][---------------------------------------------------------------------------------------------][end]`);
 
         /* Return response */
         return resp;
